@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use App\Models\StudentRec;
+use App\Models\SchoolTime;
+use Carbon\Carbon;
 
-class Student extends Model
+class StudentAbsent extends Model
 {
     use HasFactory;
 
@@ -14,8 +17,8 @@ class Student extends Model
         'id'
     ];
 
-    public function student_rec()
+    public function student()
     {
-        return $this->hasMany(StudentRec::class,'nik', 'student_nik');
+        return $this->hasOne(Student::class, 'nik', 'student_nik');
     }
 }

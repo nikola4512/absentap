@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Setting;
 use App\Models\Student;
+use App\Models\UserParent;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
@@ -97,14 +98,14 @@ class StudentController extends Controller
 
     public function import_excel(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'file' => 'required|mimes:csv,xls,xlsx'
         ]);
-
-        if (!$validator->fails()) {
+        
+        if (!$validator->fails()) { 
             $file = $request->file('file');
             DB::beginTransaction();
+            // Import file data to Student
             try {
                 $nama_file = rand() . $file->getClientOriginalName();
                 $file->move('file_import', $nama_file);
@@ -112,6 +113,19 @@ class StudentController extends Controller
                 DB::commit();
                 if (File::exists(public_path('/file_import/' . $nama_file))) {
                     File::delete(public_path('/file_import/' . $nama_file));
+                }
+
+                // Get data Student to UserParent
+                $students = Student::all();
+                // dd($students);
+    
+                foreach ($students as $student) {
+                    UserParent::create([
+                        'name' => $student->nama,
+                        'nik' => $student->nik,
+                        'username' => $student->nisn,
+                        'password' => $student->password
+                    ]);
                 }
                 $response = response()->json(['status' => 'success', 'message' => 'Data has been imported']);
             } catch (\Throwable $throw) {

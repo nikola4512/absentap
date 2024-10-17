@@ -136,6 +136,12 @@
                             <label for="formFile" class="form-label">Please choose excel file</label>
                             <input class="form-control" type="file" name="file" id="formFile" required>
                         </div>
+                        <div class="mb-3">
+                            <a href="{{ asset('file_contoh_excel/example_file.xlsx') }}"
+                                class="btn btn-outline-secondary">
+                                <i class="fas fa-download"></i> Download template file
+                            </a>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

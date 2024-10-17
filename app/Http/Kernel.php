@@ -3,6 +3,12 @@
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use App\Models\SchoolTime;
+use App\Models\StudentAbsent;
+use Carbon\Carbon;
 
 class Kernel extends HttpKernel {
     /**
@@ -29,12 +35,23 @@ class Kernel extends HttpKernel {
      */
     protected $middlewareGroups = [
         'web' => [
-            \App\Http\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \App\Http\Middleware\VerifyCsrfToken::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \App\Http\Middleware\EncryptCookies::class,
+            \App\Http\Middleware\VerifyCsrfToken::class,
+        ],
+
+        'parent' => [
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \App\Http\Middleware\EncryptCookies::class,
+            \App\Http\Middleware\VerifyCsrfToken::class,
+            \App\Http\Middleware\ParentAuthenticate::class,
+            \App\Http\Middleware\ParentVerifyCsrfToken::class,
         ],
 
         'api' => [
@@ -53,6 +70,7 @@ class Kernel extends HttpKernel {
      */
     protected $middlewareAliases = [
         'auth' => \App\Http\Middleware\Authenticate::class,
+        'parent.auth' => \App\Http\Middleware\ParentAuthenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
@@ -67,4 +85,22 @@ class Kernel extends HttpKernel {
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
     ];
+
+    protected function schedule(Schedule $schedule)
+    {
+        try {
+            $timeLimitEnd = SchoolTime::getTimeLimitEnd();
+            $timeWithAddedMinutes = Carbon::createFromFormat('H:i:s', $timeLimitEnd)->addMinutes(35)->format('H:i');
+            
+            $schedule->call(function() {
+                $currentDate = today()->toDateString();
+                DB::beginTransaction();
+                StudentAbsent::dailyAbsentRecap($currentDate);
+                DB::commit();
+            })->dailyAt($timeWithAddedMinutes);
+        } catch(\Throwable $throw) {
+            DB::rollBack();
+            Log::error($throw);
+        }
+    }
 }

@@ -64,7 +64,7 @@ class HolidayController extends Controller
             'date' => 'required|max:255',
             'name' => 'required|max:255',
         ]);
-
+ 
         if (!$validator->fails()) {
             $data = $validator->safe();
             DB::beginTransaction();

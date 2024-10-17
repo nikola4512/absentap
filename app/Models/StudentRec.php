@@ -15,6 +15,6 @@ class StudentRec extends Model
 
     public function student()
     {
-        return $this->hasOne(Student::class, 'student_nik');
+        return $this->hasOne(Student::class, 'id');
     }
 }

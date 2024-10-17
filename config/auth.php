@@ -70,7 +70,7 @@ return [
         ],
         'parents' => [
             'driver' => 'eloquent',
-            'model' => App\Models\ParentStudent::class,
+            'model' => App\Models\UserParent::class,
         ]
     ],
 

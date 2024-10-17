@@ -142,7 +142,7 @@
                         data: 'date',
                         name: 'date'
                     }
-                ],
+                ], 
             });
 
             let modalAdd = document.getElementById('modalAdd');
@@ -209,7 +209,7 @@
                             dataTable.draw();
                             bsHoliday.hide();
                         }
-                    },
+                    }, 
                     error: function(response) {
                         btnSubmit.removeClass("disabled").html(btnSubmitHtml).removeAttr(
                             "disabled");

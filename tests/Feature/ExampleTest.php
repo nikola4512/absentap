@@ -16,4 +16,20 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function userParentLoginSuccess()
+    {
+        $response = $this->post('/login', [
+            'username' => '0064707377',
+            'password' => '1871122204060001',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'status' => 'success',
+            'message' => 'Login Success, Please wait!'
+        ]);
+
+        $this->assertGuest('parent');
+    }
 }

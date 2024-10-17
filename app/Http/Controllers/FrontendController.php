@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\StudentRec;
 use Carbon\Carbon;
 use App\Models\SchoolTime;
+use App\Models\StudentAbsent;
 use App\Models\Setting;
 use App\Models\Student;
 use Illuminate\Http\Request;
